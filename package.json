@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/nao20010128nao/private-key-recovery-tool/issues"
   },
-  "homepage": "https://github.com/nao20010128nao/private-key-recovery-tool#readme"
+  "homepage": "https://github.com/nao20010128nao/private-key-recovery-tool#readme",
+  "dependencies": {
+    "bitcoinjs-lib": "^3.3.2",
+    "bn.js": "^4.11.8",
+    "elliptic": "^6.4.1"
+  }
 }

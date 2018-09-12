@@ -79,7 +79,7 @@ try {
     shell.mkdir('-p', cachePath);
 } catch (e) {}
 const lastBlockPath = path.join(cachePath, "last");
-const endPoint = "https://mona.insight.monaco-ex.org/insight-api-monacoin"
+const endPoint = "https://insight.electrum-mona.org/insight-api-monacoin";
 
 function writePath(pubKey, signature, txHash, vin) {
     const sigR = new ecSignature(signature).r.toBuffer();
@@ -112,11 +112,11 @@ function writePath(pubKey, signature, txHash, vin) {
         if (blockInfo.tx.length !== 1) {
             console.log(`Processing ${currentBlock} (#${blockInfo.height})`);
             // The first one is coinbase, so skip
-            const txs = blockInfo.tx.slice(1);
-            for (let txId of txs) {
-                const rawTxHex = (await axios(`${endPoint}/rawtx/${txId}`)).data.rawtx;
-                const rawTxBuffer = Buffer.from(rawTxHex, 'hex');
-                const loaded = bitcoin.Transaction.fromBuffer(rawTxBuffer);
+            const rawBlock = (await axios(`${endPoint}/rawblock/${currentBlock}`)).data.rawblock;
+            const rawBlockBuffer = Buffer.from(rawBlock, 'hex');
+            const loadedBlock = bitcoin.Block.fromBuffer(rawBlockBuffer);
+            for (let loaded of loadedBlock.transactions.slice(1)) {
+                const txId = loaded.getId();
                 const builder = bitcoin.TransactionBuilder.fromTransaction(loaded);
                 for (let vin in builder.inputs) {
                     vin = parseInt(vin);

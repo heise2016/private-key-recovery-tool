@@ -86,7 +86,7 @@ const endPoints = [
     "https://mona.chainsight.info/api"
 ];
 
-const endPointOffset = 0;
+let endPointOffset = 0;
 async function request(path) {
     while (true) {
         try {

@@ -79,7 +79,23 @@ try {
     shell.mkdir('-p', cachePath);
 } catch (e) {}
 const lastBlockPath = path.join(cachePath, "last");
-const endPoint = "https://insight.electrum-mona.org/insight-api-monacoin";
+const endPoints = [
+    "https://mona.monacoin.ml/insight-api-monacoin",
+    "https://mona.insight.monaco-ex.org/insight-api-monacoin",
+    "https://insight.electrum-mona.org/insight-api-monacoin",
+    "https://mona.chainsight.info/api"
+];
+
+const endPointOffset = 0;
+async function request(path) {
+    while (true) {
+        try {
+            return (await axios(`${endPoints[endPointOffset]}${path}`)).data;
+        } catch (e) {
+            endPointOffset = (endPointOffset + 1) % endPoints.length;
+        }
+    }
+}
 
 function writePath(pubKey, signature, txHash, vin) {
     const sigR = new ecSignature(signature).r.toBuffer();
@@ -104,15 +120,15 @@ function writePath(pubKey, signature, txHash, vin) {
         currentBlock = fs.readFileSync(lastBlockPath).toString('utf8').trim();
     } else {
         console.log('Fetching block hash at #1...')
-        currentBlock = (await axios.get(`${endPoint}/block-index/1`)).data.blockHash
+        currentBlock = (await request(`/block-index/1`)).blockHash;
     }
     console.log(`Starting at ${currentBlock}`)
     while (currentBlock) {
-        const blockInfo = (await axios(`${endPoint}/block/${currentBlock}`)).data;
+        const blockInfo = await request(`/block/${currentBlock}`);
         if (blockInfo.tx.length !== 1) {
             console.log(`Processing ${currentBlock} (#${blockInfo.height})`);
             // The first one is coinbase, so skip
-            const rawBlock = (await axios(`${endPoint}/rawblock/${currentBlock}`)).data.rawblock;
+            const rawBlock = (await request(`/rawblock/${currentBlock}`)).rawblock;
             const rawBlockBuffer = Buffer.from(rawBlock, 'hex');
             const loadedBlock = bitcoin.Block.fromBuffer(rawBlockBuffer);
             for (let loaded of loadedBlock.transactions.slice(1)) {

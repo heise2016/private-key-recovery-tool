@@ -8,7 +8,9 @@ const ec = require('elliptic').ec;
 const secp256k1 = new ec("secp256k1");
 const ecSignature = require("elliptic/lib/elliptic/ec/signature");
 const shell = require('shelljs');
-
+const leveldown = require('leveldown');
+const levelup = require('levelup');
+const util = require('util');
 Buffer.prototype.importDER = function _importDER() {
     class Position {
         constructor() {
@@ -78,7 +80,8 @@ const cachePath = path.join(process.cwd(), "caches");
 try {
     shell.mkdir('-p', cachePath);
 } catch (e) {}
-const lastBlockPath = path.join(cachePath, "last");
+const db = levelup(leveldown(cachePath));
+
 const endPoints = [
     "https://mona.monacoin.ml/insight-api-monacoin",
     "https://mona.insight.monaco-ex.org/insight-api-monacoin",
@@ -105,21 +108,23 @@ function writePath(pubKey, signature, txHash, vin) {
     // hash txHash and vin
     hash = crypto.createHash('sha256');
     const txVin = hash.update(Buffer.from(txHash, "hex")).digest(new bn(vin).toBuffer()).toString("hex").substring(0, 10);
-    // cachePath/pubSig/txVin
-    const finalPath = path.join(cachePath, pubSig, txVin);
-    try {
-        shell.mkdir('-p', finalPath);
-    } catch (e) {}
+    // pubSig/txVin
+    const finalPath = `${pubSig}/${txVin}`;
     return finalPath;
 }
 
+process.on('SIGINT', () => {
+    db.close();
+    process.exit();
+});
 (async () => {
     let currentBlock;
-    if (fs.existsSync(lastBlockPath)) {
-        console.log('Reading states...');
-        currentBlock = fs.readFileSync(lastBlockPath).toString('utf8').trim();
-    } else {
-        console.log('Fetching block hash at #1...')
+    console.log('Reading states...');
+    try {
+        currentBlock = await db.get('last', {
+            asBuffer: false
+        });
+    } catch (e) {
         currentBlock = (await request(`/block-index/1`)).blockHash;
     }
     console.log(`Starting at ${currentBlock}`)
@@ -149,8 +154,10 @@ function writePath(pubKey, signature, txHash, vin) {
                         sig.importDER();
                         const pubKey = secp256k1.recoverPubKey(signatureHash, sig, 0).x.toBuffer();
                         const dir = writePath(pubKey, sig, txId, vin);
-                        fs.writeFileSync(path.join(dir, "signature"), sig.toString("hex"));
-                        fs.writeFileSync(path.join(dir, "message"), signatureHash.toString("hex"));
+                        await db.batch()
+                            .put(`${dir}/signature`, sig)
+                            .put(`${dir}/message`, signatureHash)
+                            .write();
                     }
                 }
             }
@@ -159,7 +166,13 @@ function writePath(pubKey, signature, txHash, vin) {
         }
         currentBlock = blockInfo.nextblockhash;
         if (blockInfo.height % 10 == 0) {
-            fs.writeFileSync(lastBlockPath, currentBlock);
+            await db.put('last', currentBlock);
         }
     }
-})().then(console.log, console.log);
+})().then(a => {
+    console.log(a);
+    db.close();
+}).catch(a => {
+    console.log(a);
+    db.close();
+});

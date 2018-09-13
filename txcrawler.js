@@ -140,6 +140,11 @@ process.on('SIGINT', () => {
             for (let loaded of loadedBlock.transactions.slice(1)) {
                 const txId = loaded.getId();
                 const builder = bitcoin.TransactionBuilder.fromTransaction(loaded);
+                if (!builder.inputs) {
+                    console.log(`Error: ${txId} seems to be illegal`)
+                    batch = batch.put(`illegal/${txId}`, 'yes');
+                    continue;
+                }
                 for (let vin in builder.inputs) {
                     vin = parseInt(vin);
                     console.log(`Writing down ${txId.slice(0,10)}... of input #${vin}`)

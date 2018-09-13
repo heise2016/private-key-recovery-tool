@@ -136,6 +136,7 @@ process.on('SIGINT', () => {
             const rawBlock = (await request(`/rawblock/${currentBlock}`)).rawblock;
             const rawBlockBuffer = Buffer.from(rawBlock, 'hex');
             const loadedBlock = bitcoin.Block.fromBuffer(rawBlockBuffer);
+            let batch = db.batch();
             for (let loaded of loadedBlock.transactions.slice(1)) {
                 const txId = loaded.getId();
                 const builder = bitcoin.TransactionBuilder.fromTransaction(loaded);
@@ -154,13 +155,13 @@ process.on('SIGINT', () => {
                         sig.importDER();
                         const pubKey = secp256k1.recoverPubKey(signatureHash, sig, 0).x.toBuffer();
                         const dir = writePath(pubKey, sig, txId, vin);
-                        await db.batch()
+                        batch = batch
                             .put(`${dir}/signature`, sig)
-                            .put(`${dir}/message`, signatureHash)
-                            .write();
+                            .put(`${dir}/message`, signatureHash);
                     }
                 }
             }
+            await batch.write();
         } else {
             console.log(`Skipped ${currentBlock} (#${blockInfo.height})`);
         }

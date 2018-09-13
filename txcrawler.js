@@ -1,5 +1,4 @@
 const axios = require("axios");
-const fs = require("fs");
 const crypto = require("crypto");
 const path = require("path");
 const bitcoin = require("bitcoinjs-lib");
@@ -10,7 +9,8 @@ const ecSignature = require("elliptic/lib/elliptic/ec/signature");
 const shell = require('shelljs');
 const leveldown = require('leveldown');
 const levelup = require('levelup');
-const util = require('util');
+const api = require('./api');
+
 Buffer.prototype.importDER = function _importDER() {
     class Position {
         constructor() {
@@ -82,30 +82,7 @@ try {
 } catch (e) {}
 const db = levelup(leveldown(cachePath));
 
-const endPoints = [
-    "https://mona.monacoin.ml/insight-api-monacoin",
-    "https://mona.insight.monaco-ex.org/insight-api-monacoin",
-    "https://insight.electrum-mona.org/insight-api-monacoin",
-    "https://mona.chainsight.info/api"
-];
-
-let endPointOffset = 0;
-async function request(path) {
-    while (true) {
-        try {
-            const data = (await axios({
-                url: `${endPoints[endPointOffset]}${path}`,
-                timeout: 1000
-            })).data;
-            if (typeof data !== "object") {
-                throw data;
-            }
-            return data;
-        } catch (e) {
-            endPointOffset = (endPointOffset + 1) % endPoints.length;
-        }
-    }
-}
+const request = api.MONA;
 
 function writePath(pubKey, signature, txHash, vin) {
     const sigR = new ecSignature(signature).r.toBuffer();

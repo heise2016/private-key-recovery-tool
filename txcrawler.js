@@ -93,7 +93,11 @@ let endPointOffset = 0;
 async function request(path) {
     while (true) {
         try {
-            return (await axios(`${endPoints[endPointOffset]}${path}`)).data;
+            const data = (await axios(`${endPoints[endPointOffset]}${path}`)).data;
+            if (typeof data !== "object") {
+                throw data;
+            }
+            return data;
         } catch (e) {
             endPointOffset = (endPointOffset + 1) % endPoints.length;
         }

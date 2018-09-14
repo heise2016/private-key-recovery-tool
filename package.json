@@ -23,7 +23,9 @@
     "elliptic": "^6.4.1",
     "leveldown": "^4.0.1",
     "levelup": "^3.1.1",
-    "shelljs": "^0.8.2"
+    "randombytes": "^2.0.6",
+    "shelljs": "^0.8.2",
+    "tiny-secp256k1": "git+https://github.com/nao20010128nao/tiny-secp256k1.git#c4150fe"
   },
   "devDependencies": {
     "assert": "^1.4.1",

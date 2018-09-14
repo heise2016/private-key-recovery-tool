@@ -3,7 +3,7 @@ const assert = require("assert");
 const guessor = require('./guessor');
 
 describe("private key calculation", function () {
-    it("test case #1", async function () {
+    it("test case at stack overflow", async function () {
         // See https://bitcoin.stackexchange.com/questions/35848/recovering-private-key-when-someone-uses-the-same-k-twice-in-ecdsa-signatures for this test case
         const result = await guessor({
             message1Buffer: Buffer.from("01b125d18422cdfa7b153f5bcf5b01927cf59791d1d9810009c70cd37b14f4e6", "hex"),
@@ -18,7 +18,7 @@ describe("private key calculation", function () {
         return expected;
     });
 
-    it("test case #2", async function () {
+    it("invalid signature", async function () {
         // invalid signature
         try {
             await guessor({
@@ -31,12 +31,12 @@ describe("private key calculation", function () {
             throw new Error("Error should happen and unreachable");
         } catch (e) {
             // expected
-            assert.strictEqual(e.message, "cannot verify message2 from pubic key recovered from message1, refusing computation");
+            assert.strictEqual(e.message, "no candidates for public key, are they have signed by same private key?");
             return e;
         }
     });
 
-    it("test case #3", async function () {
+    it("valid signature with same parameter", async function () {
         // created using create-bad-signature.js
         const result = await guessor({
             message1Buffer: Buffer.from("8dfa42db4fd73eb62994a79fc13526810402d35a2dcc4578984b07d10fa70004", "hex"),
@@ -46,6 +46,21 @@ describe("private key calculation", function () {
             signature2Buffer: Buffer.from("3044022030c123ead7238b1aa6f74540486c02e6036d8815d3b0aab99e4130cd793a2a4c0220719a428ca808ea42121dcab5999333a3f3c563e14273a8c8ab4e0c4c1800aa52", "hex")
         });
         const expected = Buffer.from("cc4d7363c5e50e6bcef1473625617e31ce605d7ec4e734a83b3739db51daf150", "hex");
+
+        assert.deepEqual(result, expected, "private key not matched");
+        return expected;
+    });
+
+    it("valid signature with different parameter", async function () {
+        // created using create-bad-signature.js
+        const result = await guessor({
+            message1Buffer: Buffer.from("bdd4bad724f3f408993537ec824a7717595abc07b51b197ca5aeb25b32ea012e", "hex"),
+            message2Buffer: Buffer.from("15d8b21b62fbc1cda02b0fcff80f64fd626004ee0c663198a94f589404136bc9", "hex"),
+
+            signature1Buffer: Buffer.from("3044022030c123ead7238b1aa6f74540486c02e6036d8815d3b0aab99e4130cd793a2a4c0220405b931269461adc90199125335288b9f163a2999a7b6f6d45bdeebee986fb44", "hex"),
+            signature2Buffer: Buffer.from("3044022030c123ead7238b1aa6f74540486c02e6036d8815d3b0aab99e4130cd793a2a4c02204626c730ec7975930ce8aad683de04ae4669f8d67799486cb31cb47a4ba22f1b", "hex")
+        });
+        const expected = Buffer.from("7a49cdbcb02a8ede8525c2a9ae45bdcda85b86a20da161ccdc9817569e7a1c46", "hex");
 
         assert.deepEqual(result, expected, "private key not matched");
         return expected;

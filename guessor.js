@@ -27,7 +27,19 @@ module.exports = async function perform(options) {
     const signature1 = new ecSignature(signature1Buffer);
     const signature2 = new ecSignature(signature2Buffer);
 
-    const pubKey = secp256k1.recoverPubKey(message1Buffer, signature1Buffer, 0);
+    let pubKey;
+    for (let i = 0; i < 2; i++) {
+        for (let j = 0; j < 2; j++) {
+            const pointI = secp256k1.recoverPubKey(message1Buffer, signature1Buffer, i);
+            const pointJ = secp256k1.recoverPubKey(message2Buffer, signature2Buffer, j);
+            if (pointI.eq(pointJ)) {
+                pubKey = pointI;
+            }
+        }
+    }
+    if (!pubKey) {
+        throw new Error("no candidates for public key, are they have signed by same private key?");
+    }
 
     if (!signature1.r.eq(signature2.r)) {
         throw new Error("signature1.r != signature2.r, refusing computation");

@@ -4,7 +4,7 @@
   "description": "hahaha",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test.js"
   },
   "repository": {
     "type": "git",
@@ -24,5 +24,9 @@
     "leveldown": "^4.0.1",
     "levelup": "^3.1.1",
     "shelljs": "^0.8.2"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "mocha": "^5.2.0"
   }
 }

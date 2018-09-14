@@ -136,6 +136,9 @@ process.on('SIGINT', () => {
                         signatureHash = loaded.hashForSignature(vin, input2.script, bitcoin.Transaction.SIGHASH_ALL);
                     }
                     for (let sig of input.signatures) {
+                        if (!Buffer.isBuffer(sig)) {
+                            continue;
+                        }
                         sig.importDER();
                         const pubKey = secp256k1.recoverPubKey(signatureHash, sig, 0).x.toBuffer();
                         const dir = writePath(pubKey, sig, txId, vin);

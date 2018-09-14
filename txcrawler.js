@@ -1,4 +1,3 @@
-const axios = require("axios");
 const crypto = require("crypto");
 const path = require("path");
 const bitcoin = require("bitcoinjs-lib");
@@ -70,10 +69,7 @@ Buffer.prototype.importDER = function _importDER() {
         s = s.slice(1);
     }
 
-    this.r = new BN(r);
-    this.s = new BN(s);
-
-    return [this.r, this.s];
+    return [this.r = new BN(r), this.s = new BN(s)];
 };
 
 const cachePath = path.join(process.cwd(), "caches");
@@ -101,6 +97,12 @@ process.on('SIGINT', () => {
     db.close();
     process.exit();
 });
+
+function normalFinish(a) {
+    console.log(a);
+    db.close();
+}
+
 (async () => {
     let currentBlock;
     console.log('Reading states...');
@@ -157,10 +159,4 @@ process.on('SIGINT', () => {
             await db.put('last', currentBlock);
         }
     }
-})().then(a => {
-    console.log(a);
-    db.close();
-}).catch(a => {
-    console.log(a);
-    db.close();
-});
+})().then(normalFinish, normalFinish);

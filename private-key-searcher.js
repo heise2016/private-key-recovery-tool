@@ -31,9 +31,13 @@ const network = {
 };
 
 (async () => {
-    const iter = new ItrWrapper(db.iterator());
+    const iter = new ItrWrapper(db.iterator({
+        keyAsBuffer: false,
+        valueAsBuffer: false
+    }));
     const found = {};
     const wifs = [];
+    const skips = ["last"];
     try {
         while (true) {
             const {
@@ -43,10 +47,19 @@ const network = {
             if (key === undefined) {
                 break;
             }
-            if (key.endsWith("/message") || key.split("/").length != 3 || key == "last") {
+            const keyCut = key.split("/");
+            if (skips.indexOf(keyCut[0]) >= 0) {
                 continue;
             }
-            const [pubSig, txVin] = key.split("/");
+            if (key.endsWith("/wif") && keyCut.length == 2) {
+                wifs.push(value);
+                skips.push(keyCut[0]);
+                continue;
+            }
+            if (key.endsWith("/message") || keyCut.length != 3 || key == "last") {
+                continue;
+            }
+            const [pubSig, txVin] = keyCut;
             if (!found[pubSig]) {
                 console.log(`Indexed: ${pubSig} ${txVin}`);
                 found[pubSig] = txVin;
@@ -72,6 +85,7 @@ const network = {
                     wifs.push(pair.toWIF());
                     await db.put(`${pubSig}/wif`, pair.toWIF());
                     delete found[pubSig];
+                    skips.push(pubSig);
                 } catch (e) {
                     console.log(`Failed: ${e}`);
                 }

@@ -128,9 +128,9 @@ function normalFinish(a) {
                 const builder = bitcoin.TransactionBuilder.fromTransaction(loaded);
                 for (let vin in builder.inputs) {
                     vin = parseInt(vin);
-                    console.log(`Writing down ${txId.slice(0,10)}... of input #${vin}; signatures: ${input.signatures.length}`)
                     const input = builder.inputs[vin];
                     const input2 = loaded.ins[vin];
+                    console.log(`Writing down ${txId.slice(0,10)}... of input #${vin}; signatures: ${input.signatures.length}`)
                     let signatureHash; // the message
                     if (input.witness) {
                         signatureHash = loaded.hashForWitnessV0(vin, input2.script, input.value, bitcoin.Transaction.SIGHASH_ALL);

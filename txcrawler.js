@@ -78,7 +78,7 @@ try {
 } catch (e) {}
 const db = levelup(leveldown(cachePath));
 
-const request = api.MONA;
+const request = api.default;
 
 function writePath(pubKey, signature, txHash, vin) {
     const sigR = new ecSignature(signature).r.toBuffer();

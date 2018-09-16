@@ -4,6 +4,7 @@ const levelup = require('levelup');
 const bitcoin = require("bitcoinjs-lib");
 const bigi = require("bigi");
 const ItrWrapper = require("./lvldwnitr-wrapper");
+const coins = require('./coins');
 
 const cachePath = path.join(process.cwd(), "caches");
 const db = levelup(leveldown(cachePath));
@@ -18,17 +19,7 @@ function normalFinish(a) {
     db.close();
 }
 
-const network = {
-    messagePrefix: '\x19Monacoin Signed Message:\n',
-    bip32: {
-        public: 0x0488b21e,
-        private: 0x0488ade4
-    },
-    pubKeyHash: 50,
-    scriptHash: 55,
-    wif: 178, //new wif
-    bech32: "mona"
-};
+const network = coins.getNetwork();
 
 (async () => {
     const iter = new ItrWrapper(db.iterator({

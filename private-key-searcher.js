@@ -72,9 +72,10 @@ const network = coins.getNetwork();
                         network,
                         compressed: false
                     });
-                    console.log(`The result WIF is: ${pair.toWIF()}`);
-                    wifs.push(pair.toWIF());
-                    await db.put(`${pubSig}/wif`, pair.toWIF());
+                    const wif = pair.toWIF();
+                    console.log(`The result WIF is: ${wif}`);
+                    wifs.push(wif);
+                    await db.put(`${pubSig}/wif`, wif);
                     delete found[pubSig];
                     skips.push(pubSig);
                 } catch (e) {

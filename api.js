@@ -3,7 +3,9 @@ const getExp = require("./coins").getExplorer;
 
 const proxies = [
     a => a,
-    url => `https://zaif-status.herokuapp.com/proxy/${encodeURIComponent(url)}`
+    url => `https://zaif-status.herokuapp.com/proxy/${encodeURIComponent(url)}`,
+    url => `https://letsminezny.orz.hm/proxy1/${Buffer.from(url).toString('hex')}`,
+    url => `https://letsminezny.orz.hm/proxy2/${Buffer.from(url).toString('hex')}`
 ];
 
 function create(endPoints) {

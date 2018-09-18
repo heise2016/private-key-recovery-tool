@@ -18,7 +18,13 @@ const coins = {
             "https://mona.insight.monaco-ex.org/insight-api-monacoin",
             "https://insight.electrum-mona.org/insight-api-monacoin",
             "https://mona.chainsight.info/api"
-        ]
+        ],
+        rpc: {
+            host: "45.76.215.45",
+            port: 4567,
+            user: "user",
+            pass: "tooeasypassword"
+        }
     },
     BTC: {
         network: bitcoin.networks.bitcoin,
@@ -45,6 +51,10 @@ module.exports = {
     getExplorer: coin => {
         coin = coin || process.env.COIN || "MONA";
         return coins[coin].explorer;
+    },
+    getRpcParam: coin => {
+        coin = coin || process.env.COIN || "MONA";
+        return coins[coin].rpc;
     },
     getDefaultCoin: () => process.env.COIN || "MONA"
 }

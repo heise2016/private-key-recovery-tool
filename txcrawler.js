@@ -2,7 +2,6 @@ const path = require("path");
 const shell = require('shelljs');
 const leveldown = require('leveldown');
 const levelup = require('levelup');
-const api = require('./utils/api');
 const blockCracker = require("./utils/block-cracker");
 
 const cachePath = path.join(process.cwd(), "caches");
@@ -11,7 +10,8 @@ try {
 } catch (e) {}
 const db = levelup(leveldown(cachePath));
 
-const request = api.default;
+//const request = require('./utils/api').default;
+const request = new(require('./utils/rpc'))();
 
 process.on('SIGINT', () => {
     db.close();
@@ -31,17 +31,17 @@ function normalFinish(a) {
             asBuffer: false
         });
     } catch (e) {
-        currentBlock = (await request(`/block-index/1`)).blockHash;
+        currentBlock = await request.root();
     }
     console.log(`Starting at ${currentBlock}`);
     while (currentBlock) {
-        const blockInfo = await request(`/block/${currentBlock}`);
+        const blockInfo = await request.blockInfo(currentBlock);
         const height = blockInfo.height + blockInfo.confirmations - 1;
         const progress = Math.floor(blockInfo.height / height * 10000) / 100;
         if (blockInfo.tx.length !== 1) {
             console.log(`Processing ${currentBlock} (#${blockInfo.height} ${progress}%)`);
             // The first one is coinbase, so skip
-            const rawBlock = (await request(`/rawblock/${currentBlock}`)).rawblock;
+            const rawBlock = await request.rawBlock(currentBlock);
             const rawBlockBuffer = Buffer.from(rawBlock, 'hex');
             await db.batch(blockCracker(rawBlockBuffer));
         } else {

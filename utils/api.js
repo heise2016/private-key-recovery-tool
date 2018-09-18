@@ -11,7 +11,7 @@ const proxies = [
 function create(endPoints) {
     let endPointOffset = 0;
     let proxyOffset = 0;
-    return async function request(path) {
+    const request = async function request(path) {
         while (true) {
             try {
                 const data = (await axios({
@@ -31,6 +31,11 @@ function create(endPoints) {
             }
         }
     }
+    request.rawBlock = async hex => (await request(`/rawblock/${currentBlock}`)).rawblock;
+    request.blockInfo = async hex => await request(`/block/${currentBlock}`);
+    request.root = async () => (await request(`/block-index/1`)).blockHash;
+
+    return request;
 }
 create.MONA = create(getExp("MONA"));
 create.BTC = create(getExp("BTC"));

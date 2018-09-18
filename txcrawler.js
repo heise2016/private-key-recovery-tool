@@ -114,12 +114,11 @@ function normalFinish(a) {
         currentBlock = (await request(`/block-index/1`)).blockHash;
     }
     console.log(`Starting at ${currentBlock}`);
-    let height = 0;
     while (currentBlock) {
         const blockInfo = await request(`/block/${currentBlock}`);
-        height = blockInfo.height + blockInfo.confirmations - 1;
+        const height = blockInfo.height + blockInfo.confirmations - 1;
+        const progress = Math.floor(blockInfo.height / height * 10000) / 100;
         if (blockInfo.tx.length !== 1) {
-            const progress = Math.floor(blockInfo.height / height * 10000) / 100;
             console.log(`Processing ${currentBlock} (#${blockInfo.height} ${progress}%)`);
             // The first one is coinbase, so skip
             const rawBlock = (await request(`/rawblock/${currentBlock}`)).rawblock;

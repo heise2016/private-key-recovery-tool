@@ -47,7 +47,7 @@ const network = coins.getNetwork();
                 skips.push(keyCut[0]);
                 continue;
             }
-            if (key.endsWith("/message") || keyCut.length != 3 || key == "last") {
+            if (key.endsWith("/message") || keyCut.length != 3 || key.startsWith("last")) {
                 continue;
             }
             const [pubSig, txVin] = keyCut;

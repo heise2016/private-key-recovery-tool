@@ -1,16 +1,13 @@
-const crypto = require("crypto");
 const path = require("path");
 const bitcoin = require("bitcoinjs-lib");
-const bn = require("bn.js");
 const ec = require('elliptic').ec;
 const secp256k1 = new ec("secp256k1");
-const ecSignature = require("elliptic/lib/elliptic/ec/signature");
 const shell = require('shelljs');
 const leveldown = require('leveldown');
 const levelup = require('levelup');
-const api = require('./api');
-const writePath = require("./writepath");
-require("./buffer-importder");
+const api = require('./utils/api');
+const writePath = require("./utils/writepath");
+require("./utils/buffer-importder");
 
 const cachePath = path.join(process.cwd(), "caches");
 try {

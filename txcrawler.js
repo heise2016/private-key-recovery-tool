@@ -158,7 +158,10 @@ function normalFinish(a) {
         }
         currentBlock = blockInfo.nextblockhash;
         if (blockInfo.height % 10 == 0) {
-            await db.put('last', currentBlock);
+            await db.batch()
+                .put('last', currentBlock)
+                .put('last/height', `${blockInfo.height}`)
+                .write();
         }
     }
 })().then(normalFinish, normalFinish);

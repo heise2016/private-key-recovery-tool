@@ -10,8 +10,7 @@ try {
 } catch (e) {}
 const db = levelup(leveldown(cachePath));
 
-//const request = require('./utils/api').default;
-const request = new(require('./utils/rpc'))();
+const request = (require('./utils/merged'))();
 
 process.on('SIGINT', () => {
     db.close();

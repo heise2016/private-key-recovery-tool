@@ -23,7 +23,7 @@ module.exports = class RPC {
                     username: this.user,
                     password: this.pass
                 },
-                timeout: 500
+                timeout: 1500
             })).data;
             if (result.error) {
                 throw result.error;

@@ -30,7 +30,7 @@ module.exports = class RPC {
             }
             return result.result;
         } catch (e) {
-            throw e.response.data;
+            throw e.response && e.response.data || e;
         }
     }
     rawBlock(hex) {

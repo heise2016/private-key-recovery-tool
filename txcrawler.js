@@ -155,7 +155,7 @@ function normalFinish(a) {
             }
             await batch.write();
         } else {
-            console.log(`Skipped ${currentBlock} (#${blockInfo.height})`);
+            console.log(`Skipped ${currentBlock} (#${blockInfo.height} ${progress}%)`);
         }
         currentBlock = blockInfo.nextblockhash;
         if (blockInfo.height % 10 == 0) {

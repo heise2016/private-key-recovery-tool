@@ -1,3 +1,5 @@
+const bn = require("bn.js");
+
 Buffer.prototype.importDER = function _importDER() {
     class Position {
         constructor() {

@@ -1,8 +1,8 @@
 const ec = require('elliptic').ec;
 const secp256k1 = new ec("secp256k1");
 const bitcoin = require("bitcoinjs-lib");
-const writePath = require("./utils/writepath");
-require("./utils/buffer-importder");
+const writePath = require("./writepath");
+require("./buffer-importder");
 
 module.exports = function (rawBlockBuffer) {
     const batch = [];

@@ -31,8 +31,8 @@ function create(endPoints) {
             }
         }
     }
-    request.rawBlock = async hex => (await request(`/rawblock/${currentBlock}`)).rawblock;
-    request.blockInfo = async hex => await request(`/block/${currentBlock}`);
+    request.rawBlock = async hex => (await request(`/rawblock/${hex}`)).rawblock;
+    request.blockInfo = async hex => await request(`/block/${hex}`);
     request.root = async () => (await request(`/block-index/1`)).blockHash;
 
     return request;

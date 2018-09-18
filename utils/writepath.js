@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const ecSignature = require("elliptic/lib/elliptic/ec/signature");
+const bn = require("bn.js");
 
 module.exports = function writePath(pubKey, signature, txHash, vin) {
     const sigR = new ecSignature(signature).r.toBuffer();

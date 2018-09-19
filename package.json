@@ -19,6 +19,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bigi": "^1.4.2",
+    "bignumber.js": "^7.2.1",
     "bitcoinjs-lib": "^3.3.2",
     "bn.js": "^4.11.8",
     "elliptic": "^6.4.1",

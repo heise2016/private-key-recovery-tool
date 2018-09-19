@@ -42,7 +42,7 @@ function normalFinish(a) {
             // The first one is coinbase, so skip
             const rawBlock = await request.rawBlock(currentBlock);
             const rawBlockBuffer = Buffer.from(rawBlock, 'hex');
-            await db.batch(blockCracker(rawBlockBuffer));
+            await db.batch(await blockCracker(rawBlockBuffer, request));
         } else {
             console.log(`Skipped ${currentBlock} (#${blockInfo.height} ${progress}%)`);
         }

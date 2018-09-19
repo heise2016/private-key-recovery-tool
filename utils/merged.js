@@ -17,6 +17,13 @@ module.exports = () => {
                 return await api.blockInfo(hex);
             }
         },
+        async txInfo(hex) {
+            try {
+                return await rpc.txInfo(hex);
+            } catch (e) {
+                return await api.txInfo(hex);
+            }
+        },
         async root() {
             try {
                 return await rpc.root();

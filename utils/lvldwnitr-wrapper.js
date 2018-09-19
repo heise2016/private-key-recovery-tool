@@ -18,7 +18,7 @@ module.exports = class Wrapper {
     }
     end() {
         return new Promise((resolve, reject) => {
-            this.iter.end((err => {
+            this.iter.end(err => {
                 if (err) {
                     reject(err);
                 } else {

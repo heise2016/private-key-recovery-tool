@@ -1,10 +1,11 @@
-const guessor = require("./guessor");
+const guessor = require("./utils/guessor");
 const leveldown = require('leveldown');
 const levelup = require('levelup');
 const bitcoin = require("bitcoinjs-lib");
 const bigi = require("bigi");
-const ItrWrapper = require("./lvldwnitr-wrapper");
-const coins = require('./coins');
+const ItrWrapper = require("./utils/lvldwnitr-wrapper");
+const coins = require('./utils/coins');
+const path = require("path");
 
 const cachePath = path.join(process.cwd(), "caches");
 const db = levelup(leveldown(cachePath));
@@ -35,6 +36,7 @@ const network = coins.getNetwork();
                 key,
                 value
             } = await iter.next();
+            console.log(key);
             if (key === undefined) {
                 break;
             }
@@ -90,4 +92,4 @@ const network = coins.getNetwork();
             console.log(wif);
         }
     }
-}).then(normalFinish, normalFinish);
+})().then(normalFinish, normalFinish);

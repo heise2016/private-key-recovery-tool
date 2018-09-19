@@ -39,6 +39,9 @@ module.exports = class RPC {
     blockInfo(hex) {
         return this.call("getblock", [hex, true]);
     }
+    txInfo(hex) {
+        return this.call("getrawtransaction", [hex, true]);
+    }
     root() {
         return this.call("getblockhash", ["1"]);
     }

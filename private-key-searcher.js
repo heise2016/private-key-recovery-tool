@@ -27,9 +27,7 @@ const network = coins.getNetwork();
         keyAsBuffer: false,
         valueAsBuffer: true
     }));
-    const found = {};
-    const wifs = [];
-    const skips = ["last"];
+    let lastKey, lastValue;
     try {
         while (true) {
             const {
@@ -40,25 +38,22 @@ const network = coins.getNetwork();
                 break;
             }
             const keyCut = key.split("/");
-            if (skips.indexOf(keyCut[0]) >= 0) {
-                continue;
-            }
             if (key.endsWith("/wif") && keyCut.length == 2) {
                 wifs.push(value);
-                skips.push(keyCut[0]);
                 continue;
             }
             if (key.endsWith("/message") || keyCut.length != 3 || key.startsWith("last")) {
                 continue;
             }
             const [pubSig, txVin] = keyCut;
-            if (!found[pubSig]) {
+            if (lastKey != pubSig) {
                 console.log(`Indexed: ${pubSig} ${txVin}`);
-                found[pubSig] = txVin;
-            } else if ("string" === typeof found[pubSig] && found[pubSig] != txVin) {
+                lastKey = pubSig;
+                lastValue = txVin;
+            } else {
                 // found!!!
                 console.log(`Found: ${pubSig} ${txVin}`);
-                const firstName = found[pubSig];
+                const firstName = lastValue;
                 const secondName = txVin;
                 try {
                     const privateKeyD = await guessor({
@@ -77,8 +72,6 @@ const network = coins.getNetwork();
                     console.log(`The result WIF is: ${wif}`);
                     wifs.push(wif);
                     await db.put(`${pubSig}/wif`, wif);
-                    delete found[pubSig];
-                    skips.push(pubSig);
                 } catch (e) {
                     console.log(`Failed: ${e}`);
                 }

@@ -25,7 +25,7 @@ const network = coins.getNetwork();
 (async () => {
     const iter = new ItrWrapper(db.iterator({
         keyAsBuffer: false,
-        valueAsBuffer: false
+        valueAsBuffer: true
     }));
     const found = {};
     const wifs = [];
@@ -33,10 +33,9 @@ const network = coins.getNetwork();
     try {
         while (true) {
             const {
-                key,
-                value
+                k: key,
+                v: value
             } = await iter.next();
-            console.log(key);
             if (key === undefined) {
                 break;
             }

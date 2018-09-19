@@ -28,6 +28,7 @@ const network = coins.getNetwork();
         valueAsBuffer: true
     }));
     let lastKey, lastValue;
+    const wifs = [];
     try {
         while (true) {
             const {

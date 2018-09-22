@@ -43,7 +43,7 @@ module.exports = class RPC {
         return this.call("getrawtransaction", [hex, true]);
     }
     root() {
-        return this.call("getblockhash", ["1"]);
+        return this.call("getblockhash", ["100"]);
     }
     next() {}
 }

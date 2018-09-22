@@ -37,6 +37,10 @@ function normalFinish(a) {
         const blockInfo = await request.blockInfo(currentBlock);
         const height = blockInfo.height + blockInfo.confirmations - 1;
         const progress = Math.floor(blockInfo.height / height * 10000) / 100;
+        if (!blockInfo.tx) {
+            request.next();
+            continue;
+        }
         if (blockInfo.tx.length !== 1) {
             console.log(`Processing ${currentBlock} (#${blockInfo.height} ${progress}%)`);
             // The first one is coinbase, so skip

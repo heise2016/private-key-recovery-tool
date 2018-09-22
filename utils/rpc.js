@@ -45,4 +45,5 @@ module.exports = class RPC {
     root() {
         return this.call("getblockhash", ["1"]);
     }
+    next() {}
 }

@@ -24,17 +24,29 @@ function create(endPoints) {
                 }
                 return data;
             } catch (e) {
-                proxyOffset = (proxyOffset + 1) % proxies.length;
-                if (proxyOffset == 0) {
-                    endPointOffset = (endPointOffset + 1) % endPoints.length;
-                }
+                request.next();
             }
         }
     }
-    request.rawBlock = async hex => (await request(`/rawblock/${hex}`)).rawblock;
+    request.rawBlock = async hex => {
+        while (true) {
+            const rawBlock = (await request(`/rawblock/${hex}`)).rawblock;
+            if (!rawBlock) {
+                request.next();
+                continue;
+            }
+            return rawBlock;
+        }
+    };
     request.blockInfo = async hex => await request(`/block/${hex}`);
     request.txInfo = async hex => await request(`/tx/${hex}`);
     request.root = async () => (await request(`/block-index/1`)).blockHash;
+    request.next = () => {
+        proxyOffset = (proxyOffset + 1) % proxies.length;
+        if (proxyOffset == 0) {
+            endPointOffset = (endPointOffset + 1) % endPoints.length;
+        }
+    }
 
     return request;
 }

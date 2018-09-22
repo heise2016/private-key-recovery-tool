@@ -30,6 +30,10 @@ module.exports = () => {
             } catch (e) {
                 return await api.root();
             }
+        },
+        next() {
+            rpc.next();
+            api.next();
         }
     }
 }

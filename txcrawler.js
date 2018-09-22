@@ -50,7 +50,7 @@ function normalFinish(a) {
         } else {
             console.log(`Skipped ${currentBlock} (#${blockInfo.height} ${progress}%)`);
         }
-        if (blockInfo.height % 5 == 0) {
+        if (!(blockInfo.height % 5)) {
             await db.batch()
                 .put('last', currentBlock)
                 .put('last/height', `${blockInfo.height}`)

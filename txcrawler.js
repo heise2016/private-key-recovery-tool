@@ -50,12 +50,12 @@ function normalFinish(a) {
         } else {
             console.log(`Skipped ${currentBlock} (#${blockInfo.height} ${progress}%)`);
         }
-        currentBlock = blockInfo.nextblockhash;
         if (blockInfo.height % 5 == 0) {
             await db.batch()
                 .put('last', currentBlock)
                 .put('last/height', `${blockInfo.height}`)
                 .write();
         }
+        currentBlock = blockInfo.nextblockhash;
     }
 })().then(normalFinish, normalFinish);

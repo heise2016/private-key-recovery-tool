@@ -16,6 +16,9 @@ module.exports = async function (rawBlockBuffer, api) {
             vin = parseInt(vin);
             const input = builder.inputs[vin];
             const input2 = loaded.ins[vin];
+            if (!input.signatures || input.signatures.length == 0) {
+                continue;
+            }
             console.log(`Writing down ${txId.slice(0,10)}... of input #${vin}; signatures: ${input.signatures.length}`)
             let signatureHash; // the message
             if (input.witness) {
@@ -28,7 +31,7 @@ module.exports = async function (rawBlockBuffer, api) {
                      realValue = new bignumber(vout.value).times(new bignumber("100000000")).toNumber();
                  }
                  signatureHash = loaded.hashForWitnessV0(vin, input2.script, realValue, bitcoin.Transaction.SIGHASH_ALL);*/
-                console.log("SegWit is detected: skipping");
+                console.log("Witness is detected: skipping");
                 continue;
             } else {
                 signatureHash = loaded.hashForSignature(vin, input2.script, bitcoin.Transaction.SIGHASH_ALL);

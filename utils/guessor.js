@@ -1,10 +1,10 @@
 // https://bitcoin.stackexchange.com/questions/35848/recovering-private-key-when-someone-uses-the-same-k-twice-in-ecdsa-signatures
 const elliptic = require('elliptic');
 const ec = elliptic.ec;
-const curve = elliptic.curves.secp256k1;
+const curve = elliptic.curves.secp256k1.curve;
 const secp256k1 = new ec("secp256k1");
 const ecSignature = require("elliptic/lib/elliptic/ec/signature");
-
+require("./buffer-importder");
 const bn = require("bn.js");
 
 function invModN(num) {
@@ -24,12 +24,22 @@ module.exports = async function perform(options) {
     } = options;
     const z1 = new bn(message1Buffer);
     const z2 = new bn(message2Buffer);
+    signature1Buffer.importDER();
+    signature2Buffer.importDER();
     const signature1 = new ecSignature(signature1Buffer);
     const signature2 = new ecSignature(signature2Buffer);
 
+    let iMax = 2;
+    if (signature1.r.cmp(curve.p.umod(curve.n)) < 0) {
+        iMax = 4;
+    }
+    let jMax = 2;
+    if (signature2.r.cmp(curve.p.umod(curve.n)) < 0) {
+        jMax = 4;
+    }
     let pubKey;
-    for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 2; j++) {
+    for (let i = 0; i < iMax; i++) {
+        for (let j = 0; j < jMax; j++) {
             const pointI = secp256k1.recoverPubKey(message1Buffer, signature1Buffer, i);
             const pointJ = secp256k1.recoverPubKey(message2Buffer, signature2Buffer, j);
             if (pointI.eq(pointJ)) {
